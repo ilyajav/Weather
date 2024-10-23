@@ -23,21 +23,18 @@ public class Weather {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(URL))
                 .header(HEADER_KEY_NAME, ACCESS_KEY)
+                .header("Content-Type", "application/json")
                 .GET()
                 .build();
 
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("All Response: " + response.body());
-
             ObjectMapper objectMapper = new ObjectMapper();
 
             JsonNode rootNode = objectMapper.readTree(response.body());
 
             JsonNode temperature = rootNode.path("fact").get(("temp"));
-
-            System.out.println("Temperature: " + temperature + " celsius");
 
             JsonNode forecasts = rootNode.path(("forecasts"));
 
@@ -62,12 +59,16 @@ public class Weather {
 
                     summaryTemp += dayTemperature;
                 }
-
             }
 
             averageTemperature = summaryTemp / limit;
 
+            System.out.println("Response body: " + response.body());
+
+            System.out.println("Temperature: " + temperature + " celsius");
+
             System.out.println();
+
             System.out.println(
                     "Average temperature from "
                             + fistData
@@ -76,8 +77,6 @@ public class Weather {
                             + " = "
                             + averageTemperature + " celsius"
             );
-
-
 
         } catch (Exception e) {
             System.err.println("Error:" + e.getMessage());
